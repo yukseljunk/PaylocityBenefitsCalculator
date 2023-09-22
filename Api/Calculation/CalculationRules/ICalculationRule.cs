@@ -4,12 +4,9 @@ namespace Api.Calculation.CalculationRules;
 
 public interface ICalculationRule
 {
+    bool Eligible(IEmployee employee);
 
-    IEmployee Employee { get; set; }
-    bool ToBeApplied();
-
-    decimal Effect();
-
+    decimal Effect(IEmployee employee);
 
 }
 

@@ -1,4 +1,6 @@
-﻿namespace Api.Calculation.CalculationRules;
+﻿using Api.Models;
+
+namespace Api.Calculation.CalculationRules;
 
 public class BaseSalaryCalculationRule : CalculationRuleBase
 {
@@ -8,8 +10,8 @@ public class BaseSalaryCalculationRule : CalculationRuleBase
     {
         BaseSalary = baseSalary;
     }
-
-    public override bool ToBeApplied()
+    
+    public override bool Eligible(IEmployee employee)
     {
         return true;
     }

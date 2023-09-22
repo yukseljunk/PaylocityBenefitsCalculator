@@ -28,13 +28,15 @@ public class CalculationRuleEngine : ICalculationRuleEngine
     public Dictionary<ICalculationRule, decimal> Calculate(IEmployee employee)
     {
 
-        var result= new Dictionary<ICalculationRule, decimal>();    
+        var result = new Dictionary<ICalculationRule, decimal>();
+        employee.NetSalary = employee.Salary;
         foreach (var rule in calculationRules)
         {
-            rule.Employee = employee;
-            if (rule.ToBeApplied())
+            if (rule.Eligible(employee))
             {
-                result.Add(rule, rule.Effect());
+                var effect = rule.Effect(employee);
+                employee.NetSalary += effect;
+                result.Add(rule, effect);
             }
         }
 
