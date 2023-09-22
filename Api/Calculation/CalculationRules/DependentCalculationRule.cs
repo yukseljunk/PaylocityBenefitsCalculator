@@ -9,12 +9,12 @@ public class DependentCalculationRule : CalculationRuleBase
         Amount = amount;
 
     }
-    public override bool Eligible(IEmployee employee)
+    public override bool Eligible(IEmployee employee, DateTime referenceDate)
     {
         return employee.Dependents.Any(e => e.Relationship == Relationship.Spouse || e.Relationship == Relationship.DomesticPartner);
     }
 
-    public override decimal Effect(IEmployee employee)
+    public override decimal Effect(IEmployee employee, DateTime referenceDate)
     {
         return Amount;
     }

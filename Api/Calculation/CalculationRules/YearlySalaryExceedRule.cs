@@ -10,11 +10,11 @@ public class YearlySalaryExceedRule : CalculationRuleBase
         SalaryThreshold = salaryThreshold;
         Percentage = percentage;
     }
-    public override bool Eligible(IEmployee employee)
+    public override bool Eligible(IEmployee employee, DateTime referenceDate)
     {
         return employee.Salary >= SalaryThreshold;
     }
-    public override decimal Effect(IEmployee employee)
+    public override decimal Effect(IEmployee employee, DateTime referenceDate)
     {
         return -1 * employee.Salary * Percentage / 100;
     }

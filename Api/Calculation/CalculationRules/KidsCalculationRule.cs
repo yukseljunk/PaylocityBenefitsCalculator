@@ -12,14 +12,14 @@ public class KidsCalculationRule : CalculationRuleBase
         Amount = amount;
     }
 
-    public override bool Eligible(IEmployee employee)
+    public override bool Eligible(IEmployee employee, DateTime referenceDate)
     {
-        return employee.Dependents.Any(e => e.Relationship == Relationship.Child && e.Age <= MaxAgeForKids);
+        return employee.Dependents.Any(e => e.Relationship == Relationship.Child && e.Age(referenceDate) <= MaxAgeForKids);
     }
 
-    public override decimal Effect(IEmployee employee)
+    public override decimal Effect(IEmployee employee, DateTime referenceDate)
     {
-        return employee.Dependents.Count(e => e.Relationship == Relationship.Child && e.Age <= MaxAgeForKids) * Amount;
+        return employee.Dependents.Count(e => e.Relationship == Relationship.Child && e.Age(referenceDate) <= MaxAgeForKids) * Amount;
     }
 }
 

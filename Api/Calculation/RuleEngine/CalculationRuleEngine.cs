@@ -23,16 +23,16 @@ public class CalculationRuleEngine : ICalculationRuleEngine
         };
     }
 
-    public Dictionary<ICalculationRule, decimal> Calculate(IEmployee employee)
+    public Dictionary<ICalculationRule, decimal> Calculate(IEmployee employee, DateTime referenceDate)
     {
 
         var result = new Dictionary<ICalculationRule, decimal>();
         employee.MonthlySalary = employee.Salary / 12;
         foreach (var rule in calculationRules)
         {
-            if (rule.Eligible(employee))
+            if (rule.Eligible(employee, referenceDate))
             {
-                var effect = rule.Effect(employee);
+                var effect = rule.Effect(employee, referenceDate);
                 employee.MonthlySalary += effect;
                 result.Add(rule, effect);
             }

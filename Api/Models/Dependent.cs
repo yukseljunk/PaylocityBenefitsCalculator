@@ -6,20 +6,20 @@ public class Dependent
     public string? FirstName { get; set; }
     public string? LastName { get; set; }
     public DateTime DateOfBirth { get; set; }
-    public Relationship Relationship { get; set; }
+    public Relationship Relationship
+    {
+        get;
+        set;
+    }
     public int EmployeeId { get; set; }
     public Employee? Employee { get; set; }
 
-    public int Age
+    public int Age(DateTime referenceDate)
     {
-        get
-        {
-            var today = DateTime.Today;
-            var age = today.Year - DateOfBirth.Year;
-            if (today.Month < DateOfBirth.Month || (today.Month == DateOfBirth.Month && today.Day < DateOfBirth.Day))
-                age--;
-            return age;
+        var age = referenceDate.Year - DateOfBirth.Year;
+        if (referenceDate.Month < DateOfBirth.Month || (referenceDate.Month == DateOfBirth.Month && referenceDate.Day < DateOfBirth.Day))
+            age--;
+        return age;
 
-        }
     }
 }
