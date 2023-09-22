@@ -7,7 +7,12 @@ public interface IEmployee
     string? LastName { get; set; }
     decimal Salary { get; set; }
 
-    decimal NetSalary { get; set; }
+
     DateTime DateOfBirth { get; set; }
     ICollection<Dependent> Dependents { get; set; }
+
+    // extra fields
+    decimal MonthlySalary { get; set; }
+
+
 }

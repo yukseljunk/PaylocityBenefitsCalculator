@@ -1,13 +1,25 @@
-﻿namespace Api.Calculation.CalculationRules;
+﻿using Api.Models;
+namespace Api.Calculation.CalculationRules;
 
 public class KidsCalculationRule : CalculationRuleBase
 {
     private int MaxAgeForKids;
-    public KidsCalculationRule(int maxAgeForKids = 18)
+    private decimal Amount;
+    public KidsCalculationRule(int maxAgeForKids = 18, decimal amount = 600)
     {
 
         MaxAgeForKids = maxAgeForKids;
+        Amount = amount;
+    }
 
+    public override bool Eligible(IEmployee employee)
+    {
+        return employee.Dependents.Any(e => e.Relationship == Relationship.Child && e.Age <= MaxAgeForKids);
+    }
+
+    public override decimal Effect(IEmployee employee)
+    {
+        return employee.Dependents.Count(e => e.Relationship == Relationship.Child && e.Age <= MaxAgeForKids) * Amount;
     }
 }
 

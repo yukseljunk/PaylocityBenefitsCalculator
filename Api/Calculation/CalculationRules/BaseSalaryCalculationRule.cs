@@ -1,5 +1,4 @@
 ﻿using Api.Models;
-
 namespace Api.Calculation.CalculationRules;
 
 public class BaseSalaryCalculationRule : CalculationRuleBase
@@ -14,6 +13,11 @@ public class BaseSalaryCalculationRule : CalculationRuleBase
     public override bool Eligible(IEmployee employee)
     {
         return true;
+    }
+
+    public override decimal Effect(IEmployee employee)
+    {
+        return BaseSalary;
     }
 
 

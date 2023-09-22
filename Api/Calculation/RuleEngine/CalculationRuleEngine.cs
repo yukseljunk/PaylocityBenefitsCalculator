@@ -20,26 +20,23 @@ public class CalculationRuleEngine : ICalculationRuleEngine
             new KidsCalculationRule(),
             new DependentsOverAgeRule(),
             new YearlySalaryExceedRule()
-
         };
-
     }
 
     public Dictionary<ICalculationRule, decimal> Calculate(IEmployee employee)
     {
 
         var result = new Dictionary<ICalculationRule, decimal>();
-        employee.NetSalary = employee.Salary;
+        employee.MonthlySalary = employee.Salary / 12;
         foreach (var rule in calculationRules)
         {
             if (rule.Eligible(employee))
             {
                 var effect = rule.Effect(employee);
-                employee.NetSalary += effect;
+                employee.MonthlySalary += effect;
                 result.Add(rule, effect);
             }
         }
-
         return result;
     }
 }

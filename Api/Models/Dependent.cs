@@ -9,4 +9,17 @@ public class Dependent
     public Relationship Relationship { get; set; }
     public int EmployeeId { get; set; }
     public Employee? Employee { get; set; }
+
+    public int Age
+    {
+        get
+        {
+            var today = DateTime.Today;
+            var age = today.Year - DateOfBirth.Year;
+            if (today.Month < DateOfBirth.Month || (today.Month == DateOfBirth.Month && today.Day < DateOfBirth.Day))
+                age--;
+            return age;
+
+        }
+    }
 }

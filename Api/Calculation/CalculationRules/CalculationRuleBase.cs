@@ -1,5 +1,4 @@
 ﻿using Api.Models;
-
 namespace Api.Calculation.CalculationRules;
 
 public abstract class CalculationRuleBase : ICalculationRule
