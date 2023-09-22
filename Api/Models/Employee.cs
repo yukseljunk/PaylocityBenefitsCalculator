@@ -1,6 +1,7 @@
 ﻿namespace Api.Models;
 
-public class Employee
+
+public class Employee: IEmployee
 {
     public int Id { get; set; }
     public string? FirstName { get; set; }
