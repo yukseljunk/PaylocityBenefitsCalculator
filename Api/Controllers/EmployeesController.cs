@@ -1,21 +1,73 @@
 ﻿using Api.Dtos.Dependent;
 using Api.Dtos.Employee;
 using Api.Models;
+using Api.Services;
+using ErrorOr;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
+using System.Security.Claims;
 
 namespace Api.Controllers;
 
+
 [ApiController]
 [Route("api/v1/[controller]")]
-public class EmployeesController : ControllerBase
+public class EmployeesController : ApiControllerWithProblemClassified<GetEmployeeDto>
 {
+    private readonly IEmployeeService _employeeService;
+
+    public EmployeesController(IEmployeeService employeeService)
+    {
+        _employeeService = employeeService;
+    }
+
     [SwaggerOperation(Summary = "Get employee by id")]
     [HttpGet("{id}")]
     public async Task<ActionResult<ApiResponse<GetEmployeeDto>>> Get(int id)
     {
-        throw new NotImplementedException();
+        ErrorOr<Employee> getEmployeeResult = await _employeeService.GetEmployee(id);
+
+        if (getEmployeeResult.IsError) return ClassifiedProblem(getEmployeeResult.Errors);
+        return Ok(MapEmployeeResponse(getEmployeeResult.Value));
     }
+
+    [SwaggerOperation(Summary = "Create new employee")]
+    [HttpPost()]
+    public async Task<ActionResult<ApiResponse<GetEmployeeDto>>> Create(GetEmployeeDto request)
+    {
+        var dependents = new List<ErrorOr<Dependent>>();
+        request.Dependents.ToList().ForEach(dependent =>
+                dependents.Add(
+                    Dependent.Create(
+                        dependent.FirstName,
+                        dependent.LastName,
+                        dependent.DateOfBirth,
+                        dependent.Relationship
+                    )
+                )
+        );
+
+        var dependentError = dependents.Any(d => d.IsError);
+
+        if (dependentError) return ClassifiedProblem(dependents.SelectMany(d => d.Errors).ToList());
+
+        ErrorOr<Employee> requestToCreateEmployeeResult = Employee.Create(
+           request.FirstName,
+           request.LastName,
+           request.Salary,
+           request.DateOfBirth,
+           dependents.Select(d => d.Value).ToList());
+
+        if (requestToCreateEmployeeResult.IsError) return ClassifiedProblem(requestToCreateEmployeeResult.Errors);
+        var employee = requestToCreateEmployeeResult.Value;
+        
+        ErrorOr<Created> createBreakFastResult = await _employeeService.CreateEmployee(employee);
+        if (createBreakFastResult.IsError) return ClassifiedProblem(createBreakFastResult.Errors);
+
+        return CreatedAtAction(nameof(Get), new { id = employee.Id }, MapEmployeeResponse(employee));
+
+    }
+
 
     [SwaggerOperation(Summary = "Get all employees")]
     [HttpGet("")]
@@ -96,4 +148,30 @@ public class EmployeesController : ControllerBase
 
         return result;
     }
+
+    // TODO : move this method to some other class for SRP
+    private static GetEmployeeDto MapEmployeeResponse(Employee employee)
+    {
+        var dependents = new List<GetDependentDto>();
+        employee.Dependents.ToList().ForEach(dependent => dependents.Add(
+                new GetDependentDto()
+                {
+                    Id = dependent.Id,
+                    FirstName = dependent.FirstName,
+                    LastName = dependent.LastName,
+                    DateOfBirth = dependent.DateOfBirth,
+                    Relationship = dependent.Relationship
+                }
+            ));
+        return new GetEmployeeDto()
+        {
+            Id = employee.Id,
+            FirstName = employee.FirstName,
+            LastName = employee.LastName,
+            DateOfBirth = employee.DateOfBirth,
+            Dependents = dependents,
+            Salary = employee.Salary
+        };
+    }
+
 }

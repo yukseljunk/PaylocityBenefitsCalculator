@@ -1,4 +1,6 @@
-﻿namespace Api.Models;
+﻿using ErrorOr;
+
+namespace Api.Models;
 
 public class Dependent
 {
@@ -22,4 +24,34 @@ public class Dependent
         return age;
 
     }
+
+    private Dependent(int id, string? firstName, string? lastName, DateTime dateOfBirth, Relationship relationship)
+    {
+        Id = id;
+        FirstName = firstName;
+        LastName = lastName;
+        DateOfBirth = dateOfBirth;
+        Relationship = relationship;
+    }
+
+    public static ErrorOr<Dependent> Create(string? firstName, string? lastName, DateTime dateOfBirth, Relationship relationship, int? id = 0)
+    {
+        //complex validations here
+        List<Error> errors = new();
+        if (errors.Any())
+        {
+            return errors;
+        }
+
+        return new Dependent(
+            id ?? 0,
+            firstName,
+            lastName,
+            dateOfBirth,
+            relationship
+            );
+
+    }
+
+
 }

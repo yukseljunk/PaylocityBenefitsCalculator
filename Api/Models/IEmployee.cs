@@ -14,5 +14,4 @@ public interface IEmployee
     // extra fields
     decimal MonthlySalary { get; set; }
 
-
 }
