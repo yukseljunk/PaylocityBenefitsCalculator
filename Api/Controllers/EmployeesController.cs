@@ -72,8 +72,13 @@ public class EmployeesController : ApiControllerWithProblemClassified<GetEmploye
     [HttpGet("")]
     public async Task<ActionResult<ApiResponse<List<GetEmployeeDto>>>> GetAll()
     {
+        ErrorOr<List<Employee>> getEmployeesResult = await _employeeService.GetEmployees();
+        var employees = new List<GetEmployeeDto>();
+        getEmployeesResult.Value.ForEach(e => employees.Add(MapEmployeeResponse(e)));
+
+
         //task: use a more realistic production approach
-        var employees = new List<GetEmployeeDto>
+        /*var employees = new List<GetEmployeeDto>
         {
             new()
             {
@@ -138,7 +143,7 @@ public class EmployeesController : ApiControllerWithProblemClassified<GetEmploye
                 }
             }
         };
-
+        */
         var result = new ApiResponse<List<GetEmployeeDto>>
         {
             Data = employees,
