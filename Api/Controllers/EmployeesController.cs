@@ -5,7 +5,6 @@ using Api.Services;
 using ErrorOr;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
-using System.Security.Claims;
 
 namespace Api.Controllers;
 

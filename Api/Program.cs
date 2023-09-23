@@ -9,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 //Injections
+builder.Services.AddScoped<IDependentService, DependentServiceInMemory>();
 builder.Services.AddScoped<IEmployeeService, EmployeeServiceInMemory>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

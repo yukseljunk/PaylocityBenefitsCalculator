@@ -6,6 +6,12 @@ namespace Api.Services.Employee;
 public class EmployeeServiceInMemory : IEmployeeService
 {
     private static Dictionary<int, Models.Employee> _data = new();
+    private IDependentService _dependentService;
+
+    public EmployeeServiceInMemory(IDependentService dependentService)
+    {
+        _dependentService = dependentService;
+    }
 
     public async Task<ErrorOr<Created>> CreateEmployee(Models.Employee employee)
     {
@@ -17,6 +23,12 @@ public class EmployeeServiceInMemory : IEmployeeService
         }
         _data.Add(newId, employee);
         employee.Id = newId;
+
+        foreach (var dependent in employee.Dependents)
+        {
+            await _dependentService.CreateDependent(dependent);
+        }
+        
         return Result.Created;
     }
 
