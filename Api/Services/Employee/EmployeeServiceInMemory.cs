@@ -27,19 +27,24 @@ public class EmployeeServiceInMemory : IEmployeeService
         foreach (var dependent in employee.Dependents)
         {
             await _dependentService.CreateDependent(dependent);
+            dependent.EmployeeId = newId;
+            dependent.Employee = employee;
         }
-        
+
         return Result.Created;
     }
 
     public async Task<ErrorOr<Deleted>> DeleteEmployee(int id)
     {
-        if (_data.ContainsKey(id))
+        if (!_data.ContainsKey(id)) return EmployeeErrors.NotFound;
+
+        foreach (var dependent in _data[id].Dependents)
         {
-            _data.Remove(id);
-            return Result.Deleted;
+            var result = await _dependentService.DeleteDependent(dependent.Id);
+            if (result == DependentErrors.NotFound) return DependentErrors.NotFound;
         }
-        return EmployeeErrors.NotFound;
+        _data.Remove(id);
+        return Result.Deleted;
     }
 
     public async Task<ErrorOr<Models.Employee>> GetEmployee(int id)
@@ -60,14 +65,36 @@ public class EmployeeServiceInMemory : IEmployeeService
     //but a new dto needed to pass back to determine if it is update or create operation
     public async Task<ErrorOr<Updated>> Update(Models.Employee employee)
     {
-        if (_data.ContainsKey(employee.Id))
-        {
-            _data[employee.Id] = employee;
-            return Result.Updated;
+        if (!_data.ContainsKey(employee.Id)) return EmployeeErrors.NotFound;
 
+
+        //dependent operations
+        var dependents = _data[employee.Id].Dependents;
+        var newDependents = employee.Dependents;
+
+        var removedDependentIds = newDependents.Select(nd => nd.Id).Except(dependents.Select(n => n.Id));
+        var existentDependentIds = dependents.Select(nd => nd.Id).Intersect(newDependents.Select(n => n.Id));
+
+        foreach (var dependentId in removedDependentIds)
+        {
+            var deleteResult = await _dependentService.DeleteDependent(dependentId);
+            if (deleteResult == DependentErrors.NotFound) return DependentErrors.NotFound;
         }
-        return EmployeeErrors.NotFound;
+        foreach (var dependentId in existentDependentIds)
+        {
+            var updateResult = await _dependentService.Update(newDependents.First(d => d.Id == dependentId));
+            if (updateResult == DependentErrors.NotFound) return DependentErrors.NotFound;
+        }
+
+        foreach (var dependent in dependents)
+        {
+            if (removedDependentIds.Contains(dependent.Id) || existentDependentIds.Contains(dependent.Id)) continue;
+            await _dependentService.CreateDependent(dependent);
+        }
+
+        _data[employee.Id] = employee;
+        return Result.Updated;
     }
 
-   
+
 }

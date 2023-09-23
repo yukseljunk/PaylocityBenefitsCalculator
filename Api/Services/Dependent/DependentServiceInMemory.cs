@@ -22,12 +22,10 @@ public class DependentServiceInMemory : IDependentService
 
     public async Task<ErrorOr<Deleted>> DeleteDependent(int id)
     {
-        if (_data.ContainsKey(id))
-        {
-            _data.Remove(id);
-            return Result.Deleted;
-        }
-        return DependentErrors.NotFound;
+        if (!_data.ContainsKey(id)) return DependentErrors.NotFound;
+
+        _data.Remove(id);
+        return Result.Deleted;
     }
 
     public async Task<ErrorOr<Dependent>> GetDependent(int id)
