@@ -1,15 +1,13 @@
-﻿using Api.Dtos.Employee;
-using Api.Models;
-using ErrorOr;
+﻿using ErrorOr;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Net;
 
 namespace Api.Controllers;
 
-public class ApiControllerWithProblemClassified<T> : ControllerBase
+public class ApiControllerWithProblemClassified : ControllerBase
 {
-    protected ActionResult<ApiResponse<T>> ClassifiedProblem(List<Error> errors)
+    protected ActionResult ClassifiedProblem(List<Error> errors)
     {
         if (errors.All(e => e.Type == ErrorType.Validation))
         {
