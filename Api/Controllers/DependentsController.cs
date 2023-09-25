@@ -1,4 +1,5 @@
 ﻿using Api.Dtos.Dependent;
+using Api.Dtos.Employee;
 using Api.Mappers;
 using Api.Models;
 using Api.Services;
@@ -28,6 +29,49 @@ public class DependentsController : ApiControllerWithProblemClassified
         if (getDependentResult.IsError) return ClassifiedProblem(getDependentResult.Errors);
         return Ok(ModelToDtoMapper.MapDependentResponse(getDependentResult.Value));
     }
+
+    [SwaggerOperation(Summary = "Delete dependent by id")]
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> DeleteDependent(int id)
+    {
+        ErrorOr<Deleted> deleteDependentResult = await _dependentService.DeleteDependent(id);
+        if (deleteDependentResult.IsError)
+        {
+            return ClassifiedProblem(deleteDependentResult.Errors);
+        }
+        return NoContent();
+    }
+
+
+    [SwaggerOperation(Summary = "Update a dependent")]
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> UpdateDependent(int id, GetDependentDto request)
+    {
+
+        ErrorOr<Dependent> requestToCreateDependentResult = Dependent.Create(
+                        request.FirstName,
+                        request.LastName,
+                        request.DateOfBirth,
+                        request.Relationship,
+                        request.Id
+                    );
+
+        if (requestToCreateDependentResult.IsError)
+        {
+            return ClassifiedProblem(requestToCreateDependentResult.Errors);
+        }
+
+        var dependent = requestToCreateDependentResult.Value;
+
+        var updateDependentResult = await _dependentService.Update(dependent);
+        if (updateDependentResult.IsError)
+        {
+            return ClassifiedProblem(updateDependentResult.Errors);
+        }
+        return NoContent();
+    }
+
+
 
     [SwaggerOperation(Summary = "Get all dependents")]
     [HttpGet("")]

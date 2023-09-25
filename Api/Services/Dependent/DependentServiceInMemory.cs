@@ -23,6 +23,9 @@ public class DependentServiceInMemory : IDependentService
     public async Task<ErrorOr<Deleted>> DeleteDependent(int id)
     {
         if (!_data.ContainsKey(id)) return DependentErrors.NotFound;
+        //delete the relationship
+        var dependentToDelete = _data[id];
+        dependentToDelete.Employee?.Dependents.Remove(dependentToDelete);
 
         _data.Remove(id);
         return Result.Deleted;
@@ -46,6 +49,15 @@ public class DependentServiceInMemory : IDependentService
     {
         if (_data.ContainsKey(dependent.Id))
         {
+            //update the employee dependent object
+            var employee = _data[dependent.Id].Employee;
+            var employeeDependent = employee?.Dependents.FirstOrDefault(d => d.Id == dependent.Id);
+            if (employeeDependent != null)
+            {
+                employee?.Dependents.Remove(employeeDependent);
+                employee?.Dependents.Add(dependent);
+            }
+
             _data[dependent.Id] = dependent;
             return Result.Updated;
 
