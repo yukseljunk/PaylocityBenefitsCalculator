@@ -1,5 +1,5 @@
-﻿using Api.Dtos.Dependent;
-using Api.Dtos.Employee;
+﻿using Api.Dtos.Employee;
+using Api.Mappers;
 using Api.Models;
 using Api.Services;
 using ErrorOr;
@@ -27,7 +27,7 @@ public class EmployeesController : ApiControllerWithProblemClassified
         ErrorOr<Employee> getEmployeeResult = await _employeeService.GetEmployee(id);
 
         if (getEmployeeResult.IsError) return ClassifiedProblem(getEmployeeResult.Errors);
-        return Ok(MapEmployeeResponse(getEmployeeResult.Value));
+        return Ok(ModelToDtoMapper.MapEmployeeResponse(getEmployeeResult.Value));
     }
 
     [SwaggerOperation(Summary = "Delete employee by id")]
@@ -76,7 +76,7 @@ public class EmployeesController : ApiControllerWithProblemClassified
         ErrorOr<Created> createBreakFastResult = await _employeeService.CreateEmployee(employee);
         if (createBreakFastResult.IsError) return ClassifiedProblem(createBreakFastResult.Errors);
 
-        return CreatedAtAction(nameof(Get), new { id = employee.Id }, MapEmployeeResponse(employee));
+        return CreatedAtAction(nameof(Get), new { id = employee.Id }, ModelToDtoMapper.MapEmployeeResponse(employee));
 
     }
 
@@ -130,7 +130,7 @@ public class EmployeesController : ApiControllerWithProblemClassified
 
         ErrorOr<List<Employee>> getEmployeesResult = await _employeeService.GetEmployees();
         var employees = new List<GetEmployeeDto>();
-        getEmployeesResult.Value.ForEach(e => employees.Add(MapEmployeeResponse(e)));
+        getEmployeesResult.Value.ForEach(e => employees.Add(ModelToDtoMapper.MapEmployeeResponse(e)));
 
 
         //task: use a more realistic production approach
@@ -141,31 +141,6 @@ public class EmployeesController : ApiControllerWithProblemClassified
         };
 
         return result;
-    }
-
-    // TODO : move this method to some other class for SRP
-    private static GetEmployeeDto MapEmployeeResponse(Employee employee)
-    {
-        var dependents = new List<GetDependentDto>();
-        employee.Dependents.ToList().ForEach(dependent => dependents.Add(
-                new GetDependentDto()
-                {
-                    Id = dependent.Id,
-                    FirstName = dependent.FirstName,
-                    LastName = dependent.LastName,
-                    DateOfBirth = dependent.DateOfBirth,
-                    Relationship = dependent.Relationship
-                }
-            ));
-        return new GetEmployeeDto()
-        {
-            Id = employee.Id,
-            FirstName = employee.FirstName,
-            LastName = employee.LastName,
-            DateOfBirth = employee.DateOfBirth,
-            Dependents = dependents,
-            Salary = employee.Salary
-        };
     }
 
 }

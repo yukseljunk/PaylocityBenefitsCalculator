@@ -1,5 +1,5 @@
 ﻿using Api.Dtos.Dependent;
-using Api.Dtos.Employee;
+using Api.Mappers;
 using Api.Models;
 using Api.Services;
 using ErrorOr;
@@ -26,7 +26,7 @@ public class DependentsController : ApiControllerWithProblemClassified
         ErrorOr<Dependent> getDependentResult = await _dependentService.GetDependent(id);
 
         if (getDependentResult.IsError) return ClassifiedProblem(getDependentResult.Errors);
-        return Ok(MapDependentResponse(getDependentResult.Value));
+        return Ok(ModelToDtoMapper.MapDependentResponse(getDependentResult.Value));
     }
 
     [SwaggerOperation(Summary = "Get all dependents")]
@@ -35,7 +35,7 @@ public class DependentsController : ApiControllerWithProblemClassified
     {
         ErrorOr<List<Dependent>> getDependentResult = await _dependentService.GetDependents();
         var dependents = new List<GetDependentDto>();
-        getDependentResult.Value.ForEach(e => dependents.Add(MapDependentResponse(e)));
+        getDependentResult.Value.ForEach(e => dependents.Add(ModelToDtoMapper.MapDependentResponse(e)));
 
 
         //task: use a more realistic production approach
@@ -46,22 +46,6 @@ public class DependentsController : ApiControllerWithProblemClassified
         };
 
         return result;
-    }
-
-
-    // TODO : move this method to some other class for SRP, call from other map function
-    private static GetDependentDto MapDependentResponse(Dependent dependent)
-    {
-        return new GetDependentDto()
-        {
-            Id = dependent.Id,
-            FirstName = dependent.FirstName,
-            LastName = dependent.LastName,
-            DateOfBirth = dependent.DateOfBirth,
-            Relationship = dependent.Relationship
-        };
-
-
     }
 
 }
