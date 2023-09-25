@@ -106,7 +106,8 @@ public class EmployeesController : ApiControllerWithProblemClassified
            request.LastName,
            request.Salary,
            request.DateOfBirth,
-           dependents.Select(d => d.Value).ToList());
+           dependents.Select(d => d.Value).ToList(), 
+           id);
 
         if (requestToCreateEmployeeResult.IsError) return ClassifiedProblem(requestToCreateEmployeeResult.Errors);
         var employee = requestToCreateEmployeeResult.Value;

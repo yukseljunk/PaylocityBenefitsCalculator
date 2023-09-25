@@ -1,4 +1,7 @@
-﻿using ErrorOr;
+﻿using Api.ServiceErrors;
+using Api.Services;
+using ErrorOr;
+using System.Xml.Linq;
 
 namespace Api.Models;
 
@@ -20,9 +23,9 @@ public class Employee : IEmployee
     {
         Id = id;
         FirstName = firstName;
-        LastName = lastName;    
-        Salary= salary;
-        DateOfBirth = dateOfBirth;  
+        LastName = lastName;
+        Salary = salary;
+        DateOfBirth = dateOfBirth;
         Dependents = dependents;
     }
 
@@ -31,6 +34,31 @@ public class Employee : IEmployee
     {
         //complex validations here
         List<Error> errors = new();
+
+
+        var spouseDependentCount = dependents.Count(d => d.Relationship == Relationship.Spouse || d.Relationship == Relationship.DomesticPartner);
+        if (spouseDependentCount > 1)
+        {
+            errors.Add(EmployeeErrors.NotMoreThanOneSpouse);
+        }
+
+        var noRelationshipDependentCount = dependents.Count(d => d.Relationship == Relationship.None);
+        if (noRelationshipDependentCount > 0)
+        {
+            errors.Add(DependentErrors.NoRelationshipDependent);
+        }
+
+        if (id != null && id.Value > 0)
+        {
+            //update validations
+
+            var dependentIdDuplicateExists = dependents.GroupBy(d => d.Id).Any(dg => dg.Count() > 1);
+            if (dependentIdDuplicateExists)
+            {
+                errors.Add(DependentErrors.DuplicateId);
+            }
+        }
+
         if (errors.Any())
         {
             return errors;
