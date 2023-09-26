@@ -1,4 +1,5 @@
-﻿using ErrorOr;
+﻿using Api.ServiceErrors;
+using ErrorOr;
 
 namespace Api.Models;
 
@@ -38,6 +39,20 @@ public class Dependent
     {
         //complex validations here
         List<Error> errors = new();
+        if (dateOfBirth >= DateTime.Now)
+        {
+            errors.Add(EmployeeErrors.BirthdayBeforeToday);
+        }
+        var fullName = $"{firstName??""} {lastName ?? ""}";
+        if (!Enum.IsDefined(typeof(Relationship), relationship))
+        {
+            errors.Add(DependentErrors.InvalidRelationshipDependent(fullName));
+        }
+        if (relationship==Relationship.None)
+        {
+            errors.Add(DependentErrors.NoRelationshipDependent(fullName));
+        }
+
         if (errors.Any())
         {
             return errors;

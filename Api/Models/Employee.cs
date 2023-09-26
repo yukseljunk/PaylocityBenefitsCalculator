@@ -34,24 +34,11 @@ public class Employee : IEmployee
     {
         //complex validations here
         List<Error> errors = new();
-
-        var invalidDependents = dependents.Where(d => !Enum.IsDefined(typeof(Relationship), d.Relationship));
-        if (invalidDependents.Any())
-        {
-            errors.Add(DependentErrors.InvalidRelationshipDependent(invalidDependents.Select(d => d.Id).ToArray()));
-        }
-
-
+        
         var spouseDependentCount = dependents.Count(d => d.Relationship == Relationship.Spouse || d.Relationship == Relationship.DomesticPartner);
         if (spouseDependentCount > 1)
         {
             errors.Add(EmployeeErrors.NotMoreThanOneSpouse);
-        }
-
-        var noRelationshipDependents = dependents.Where(d => d.Relationship == Relationship.None);
-        if (noRelationshipDependents.Any())
-        {
-            errors.Add(DependentErrors.NoRelationshipDependent(noRelationshipDependents.Select(d => d.Id).ToArray()));
         }
 
         if (id != null && id.Value > 0)
@@ -63,6 +50,10 @@ public class Employee : IEmployee
             {
                 errors.Add(DependentErrors.DuplicateId(dependentIdDuplicates.Select(d => d.Key).ToArray()));
             }
+        }
+        if (dateOfBirth >= DateTime.Now)
+        {
+            errors.Add(EmployeeErrors.BirthdayBeforeToday);
         }
 
         if (errors.Any())

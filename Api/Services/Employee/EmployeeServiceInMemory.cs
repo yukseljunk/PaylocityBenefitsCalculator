@@ -64,11 +64,11 @@ public class EmployeeServiceInMemory : IEmployeeService
 
     //Can be replaced with upsert, then no need to check for existence,
     //but a new dto needed to pass back to determine if it is update or create operation
+    //TODO: THis is buggy: an employee with a dependent id 1, another employee with a dep id 2; update first employee with dep1 should not be possible
+    //so logic needs to be using dependent service
     public async Task<ErrorOr<Updated>> Update(Models.Employee employee)
     {
         if (!_data.ContainsKey(employee.Id)) return EmployeeErrors.NotFound(employee.Id);
-
-        //todo: fix duplicate id issue
 
         //dependent operations
         var dependents = _data[employee.Id].Dependents;
