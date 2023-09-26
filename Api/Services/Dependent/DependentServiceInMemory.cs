@@ -45,27 +45,28 @@ public class DependentServiceInMemory : IDependentService
         return _data.Values.ToList();
     }
 
-    public async Task<ErrorOr<Updated>> Update(Dependent dependent, bool propagate = true)
+    public async Task<ErrorOr<Updated>> Update(Dependent dependent)
     {
         if (_data.ContainsKey(dependent.Id))
         {
             var employee = _data[dependent.Id].Employee;
-            //update the employee dependent object if propagation asked
-            if (propagate)
-            {
-                var employeeDependent = employee?.Dependents.FirstOrDefault(d => d.Id == dependent.Id);
-                if (employeeDependent != null)
-                {
-                    employee?.Dependents.Remove(employeeDependent);
-                    employee?.Dependents.Add(dependent);
-                }
-            }
 
-            _data[dependent.Id] = dependent;
+            //update the employee dependent object
+            var employeeDependent = employee?.Dependents.FirstOrDefault(d => d.Id == dependent.Id);
+            if (employeeDependent != null)
+            {
+                employee?.Dependents.Remove(employeeDependent);
+                employee?.Dependents.Add(dependent);
+            }
+            
             //fill employee values for the new objects
             dependent.Employee = employee;
             dependent.EmployeeId = employee.Id;
 
+
+            _data[dependent.Id] = dependent;
+            
+            
             return Result.Updated;
 
         }

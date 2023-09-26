@@ -10,7 +10,7 @@ public interface IDependentService
 
     Task<ErrorOr<Models.Dependent>> GetDependent(int id);
 
-    Task<ErrorOr<Updated>> Update(Models.Dependent dependent, bool propagate = true);
+    Task<ErrorOr<Updated>> Update(Models.Dependent dependent);
 
     Task<ErrorOr<List<Models.Dependent>>> GetDependents();
 

@@ -74,8 +74,8 @@ public class EmployeeServiceInMemory : IEmployeeService
         var dependents = _data[employee.Id].Dependents;
         var newDependents = employee.Dependents;
 
-        var removedDependentIds = newDependents.Select(nd => nd.Id).Except(dependents.Select(n => n.Id));
-        var existentDependentIds = dependents.Select(nd => nd.Id).Intersect(newDependents.Select(n => n.Id));
+        var removedDependentIds = dependents.Select(nd => nd.Id).Except(newDependents.Select(n => n.Id)).ToList();
+        var existentDependentIds = dependents.Select(nd => nd.Id).Intersect(newDependents.Select(n => n.Id)).ToList();
 
         //deleted dependents
         foreach (var dependentId in removedDependentIds)
@@ -86,7 +86,7 @@ public class EmployeeServiceInMemory : IEmployeeService
         //updated dependents
         foreach (var dependentId in existentDependentIds)
         {
-            var updateResult = await _dependentService.Update(newDependents.First(d => d.Id == dependentId), false);
+            var updateResult = await _dependentService.Update(newDependents.First(d => d.Id == dependentId));
             if (updateResult == DependentErrors.NotFound(dependentId)) return DependentErrors.NotFound(dependentId);
         }
 
