@@ -1,4 +1,5 @@
-﻿using Api.ServiceErrors;
+﻿using Api.Models;
+using Api.ServiceErrors;
 using ErrorOr;
 
 namespace Api.Services.Employee;
@@ -36,12 +37,12 @@ public class EmployeeServiceInMemory : IEmployeeService
 
     public async Task<ErrorOr<Deleted>> DeleteEmployee(int id)
     {
-        if (!_data.ContainsKey(id)) return EmployeeErrors.NotFound;
+        if (!_data.ContainsKey(id)) return EmployeeErrors.NotFound(id);
 
         foreach (var dependent in _data[id].Dependents)
         {
             var result = await _dependentService.DeleteDependent(dependent.Id);
-            if (result == DependentErrors.NotFound) return DependentErrors.NotFound;
+            if (result == DependentErrors.NotFound(id)) return DependentErrors.NotFound(id);
         }
         _data.Remove(id);
         return Result.Deleted;
@@ -53,7 +54,7 @@ public class EmployeeServiceInMemory : IEmployeeService
         {
             return _data[id];
         }
-        return EmployeeErrors.NotFound;
+        return EmployeeErrors.NotFound(id);
     }
 
     public async Task<ErrorOr<List<Models.Employee>>> GetEmployees()
@@ -65,7 +66,7 @@ public class EmployeeServiceInMemory : IEmployeeService
     //but a new dto needed to pass back to determine if it is update or create operation
     public async Task<ErrorOr<Updated>> Update(Models.Employee employee)
     {
-        if (!_data.ContainsKey(employee.Id)) return EmployeeErrors.NotFound;
+        if (!_data.ContainsKey(employee.Id)) return EmployeeErrors.NotFound(employee.Id);
 
         //todo: fix duplicate id issue
 
@@ -79,12 +80,12 @@ public class EmployeeServiceInMemory : IEmployeeService
         foreach (var dependentId in removedDependentIds)
         {
             var deleteResult = await _dependentService.DeleteDependent(dependentId);
-            if (deleteResult == DependentErrors.NotFound) return DependentErrors.NotFound;
+            if (deleteResult == DependentErrors.NotFound(dependentId)) return DependentErrors.NotFound(dependentId);
         }
         foreach (var dependentId in existentDependentIds)
         {
             var updateResult = await _dependentService.Update(newDependents.First(d => d.Id == dependentId));
-            if (updateResult == DependentErrors.NotFound) return DependentErrors.NotFound;
+            if (updateResult == DependentErrors.NotFound(dependentId)) return DependentErrors.NotFound(dependentId);
         }
 
         foreach (var dependent in dependents)

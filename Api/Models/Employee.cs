@@ -35,6 +35,12 @@ public class Employee : IEmployee
         //complex validations here
         List<Error> errors = new();
 
+        var invalidDependents = dependents.Where(d => !Enum.IsDefined(typeof(Relationship), d.Relationship));
+        if (invalidDependents.Any())
+        {
+            errors.Add(DependentErrors.InvalidRelationshipDependent(invalidDependents.Select(d => d.Id).ToArray()));
+        }
+
 
         var spouseDependentCount = dependents.Count(d => d.Relationship == Relationship.Spouse || d.Relationship == Relationship.DomesticPartner);
         if (spouseDependentCount > 1)
@@ -42,20 +48,20 @@ public class Employee : IEmployee
             errors.Add(EmployeeErrors.NotMoreThanOneSpouse);
         }
 
-        var noRelationshipDependentCount = dependents.Count(d => d.Relationship == Relationship.None);
-        if (noRelationshipDependentCount > 0)
+        var noRelationshipDependents = dependents.Where(d => d.Relationship == Relationship.None);
+        if (noRelationshipDependents.Any())
         {
-            errors.Add(DependentErrors.NoRelationshipDependent);
+            errors.Add(DependentErrors.NoRelationshipDependent(noRelationshipDependents.Select(d => d.Id).ToArray()));
         }
 
         if (id != null && id.Value > 0)
         {
             //update validations
 
-            var dependentIdDuplicateExists = dependents.GroupBy(d => d.Id).Any(dg => dg.Count() > 1);
-            if (dependentIdDuplicateExists)
+            var dependentIdDuplicates = dependents.GroupBy(d => d.Id).Where(dg => dg.Count() > 1);
+            if (dependentIdDuplicates.Any())
             {
-                errors.Add(DependentErrors.DuplicateId);
+                errors.Add(DependentErrors.DuplicateId(dependentIdDuplicates.Select(d => d.Key).ToArray()));
             }
         }
 
