@@ -1,3 +1,4 @@
+using Api.Middlewares;
 using Api.Services;
 using Api.Services.Employee;
 using Microsoft.OpenApi.Models;
@@ -11,6 +12,7 @@ builder.Services.AddControllers();
 //Injections
 builder.Services.AddScoped<IDependentService, DependentServiceInMemory>();
 builder.Services.AddScoped<IEmployeeService, EmployeeServiceInMemory>();
+builder.Services.AddTransient<GlobalExceptionHandlingMiddleware>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -46,6 +48,8 @@ app.UseCors(allowLocalhost);
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
 
 app.MapControllers();
 
