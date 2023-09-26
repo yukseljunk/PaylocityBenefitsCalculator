@@ -7,7 +7,7 @@ namespace Api.Services.Employee;
 public class EmployeeServiceInMemory : IEmployeeService
 {
     private static Dictionary<int, Models.Employee> _data = new();
-    private IDependentService _dependentService;
+    public IDependentService _dependentService;
 
     public EmployeeServiceInMemory(IDependentService dependentService)
     {
@@ -77,23 +77,32 @@ public class EmployeeServiceInMemory : IEmployeeService
         var removedDependentIds = newDependents.Select(nd => nd.Id).Except(dependents.Select(n => n.Id));
         var existentDependentIds = dependents.Select(nd => nd.Id).Intersect(newDependents.Select(n => n.Id));
 
+        //deleted dependents
         foreach (var dependentId in removedDependentIds)
         {
             var deleteResult = await _dependentService.DeleteDependent(dependentId);
             if (deleteResult == DependentErrors.NotFound(dependentId)) return DependentErrors.NotFound(dependentId);
         }
+        //updated dependents
         foreach (var dependentId in existentDependentIds)
         {
-            var updateResult = await _dependentService.Update(newDependents.First(d => d.Id == dependentId));
+            var updateResult = await _dependentService.Update(newDependents.First(d => d.Id == dependentId), false);
             if (updateResult == DependentErrors.NotFound(dependentId)) return DependentErrors.NotFound(dependentId);
         }
 
-        foreach (var dependent in dependents)
+        //rest are new dependents
+        foreach (var dependent in newDependents)
         {
             if (removedDependentIds.Contains(dependent.Id) || existentDependentIds.Contains(dependent.Id)) continue;
             await _dependentService.CreateDependent(dependent);
         }
 
+        //set newdependent's employee fields 
+        foreach (var dependent in newDependents)
+        {
+            dependent.EmployeeId = employee.Id;
+            dependent.Employee = employee;
+        }
         _data[employee.Id] = employee;
         return Result.Updated;
     }
