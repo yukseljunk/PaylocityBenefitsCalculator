@@ -30,18 +30,6 @@ public class EmployeesController : ApiControllerWithProblemClassified
         return Ok(ModelToDtoMapper.MapEmployeeResponse(getEmployeeResult.Value));
     }
 
-    [SwaggerOperation(Summary = "Get employee bonus by week number")]
-    [HttpGet("{id}/bonus/{weekNo:int}")]
-    public async Task<ActionResult<ApiResponse<GetEmployeeDto>>> GetBonus(int id, int weekNo)
-    {
-        ErrorOr<Employee> getEmployeeResult = await _employeeService.GetEmployee(id);
-
-        if (getEmployeeResult.IsError) return ClassifiedProblem(getEmployeeResult.Errors);
-
-        throw new Exception("Need to figure out the rest...");
-        //return Ok(ModelToDtoMapper.MapEmployeeResponse(getEmployeeResult.Value));
-    }
-
 
     [SwaggerOperation(Summary = "Delete employee by id")]
     [HttpDelete("{id:int}")]

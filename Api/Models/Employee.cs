@@ -1,7 +1,5 @@
 ﻿using Api.ServiceErrors;
-using Api.Services;
 using ErrorOr;
-using System.Xml.Linq;
 
 namespace Api.Models;
 
