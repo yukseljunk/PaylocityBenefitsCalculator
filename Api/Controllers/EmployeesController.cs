@@ -128,13 +128,12 @@ public class EmployeesController : ApiControllerWithProblemClassified
     [HttpGet("")]
     public async Task<ActionResult<ApiResponse<List<GetEmployeeDto>>>> GetAll()
     {
-
+        //task: use a more realistic production approach
+        //solution: using service interface that can be easily changed later
         ErrorOr<List<Employee>> getEmployeesResult = await _employeeService.GetEmployees();
         var employees = new List<GetEmployeeDto>();
         getEmployeesResult.Value.ForEach(e => employees.Add(ModelToDtoMapper.MapEmployeeResponse(e)));
-
-
-        //task: use a more realistic production approach
+               
         var result = new ApiResponse<List<GetEmployeeDto>>
         {
             Data = employees,

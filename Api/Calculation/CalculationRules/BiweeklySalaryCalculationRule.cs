@@ -3,8 +3,6 @@ namespace Api.Calculation.CalculationRules;
 
 public class BiweeklySalaryCalculationRule : CalculationRuleBase
 {
-    private decimal BaseSalary;
-
     public override bool Eligible(IEmployee employee, int weekNo)
     {
         return true;
