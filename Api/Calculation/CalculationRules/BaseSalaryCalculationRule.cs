@@ -10,12 +10,12 @@ public class BaseSalaryCalculationRule : CalculationRuleBase
         BaseSalary = baseSalary;
     }
     
-    public override bool Eligible(IEmployee employee, DateTime referenceDate)
+    public override bool Eligible(IEmployee employee, int weekNo)
     {
         return true;
     }
 
-    public override decimal Effect(IEmployee employee, DateTime referenceDate)
+    public override decimal Effect(IEmployee employee, int weekNo)
     {
         return BaseSalary/2;
     }

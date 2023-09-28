@@ -12,14 +12,14 @@ public class DependentsOverAgeRule : CalculationRuleBase
         Amount = amount;
     }
 
-    public override bool Eligible(IEmployee employee, DateTime referenceDate)
+    public override bool Eligible(IEmployee employee, int weekNo)
     {
         var spouse = employee.Dependents.FirstOrDefault(e => e.Relationship == Relationship.Spouse || e.Relationship == Relationship.DomesticPartner);
-        return spouse == null ? false : spouse.Age(referenceDate) >= AgeThreshold;
+        return spouse == null ? false : true;
 
     }
 
-    public override decimal Effect(IEmployee employee, DateTime referenceDate)
+    public override decimal Effect(IEmployee employee, int weekNo)
     {
         return Amount/2;
     }

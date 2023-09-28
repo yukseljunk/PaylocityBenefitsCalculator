@@ -5,12 +5,12 @@ public class BiweeklySalaryCalculationRule : CalculationRuleBase
 {
     private decimal BaseSalary;
 
-    public override bool Eligible(IEmployee employee, DateTime referenceDate)
+    public override bool Eligible(IEmployee employee, int weekNo)
     {
         return true;
     }
 
-    public override decimal Effect(IEmployee employee, DateTime referenceDate)
+    public override decimal Effect(IEmployee employee, int weekNo)
     {
         return employee.Salary/26;
     }

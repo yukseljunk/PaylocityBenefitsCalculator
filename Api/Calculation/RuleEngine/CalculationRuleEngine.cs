@@ -23,16 +23,22 @@ public class CalculationRuleEngine : ICalculationRuleEngine
         };
     }
 
-    public Dictionary<ICalculationRule, decimal> Calculate(IEmployee employee, DateTime referenceDate)
+    public Dictionary<ICalculationRule, decimal> Calculate(IEmployee employee,
+        int weekNo, 
+        Dictionary<int, Tuple<DateTime, DateTime>> weeksForYear, 
+        Dictionary<int, int> paycheckCountForMonth)
     {
 
         var result = new Dictionary<ICalculationRule, decimal>();
         employee.BiWeeklySalary = 0;
         foreach (var rule in calculationRules)
         {
-            if (rule.Eligible(employee, referenceDate))
+            rule.WeeksForYear= weeksForYear;
+            rule.PaycheckCountForMonth= paycheckCountForMonth;
+
+            if (rule.Eligible(employee, weekNo))
             {
-                var effect = rule.Effect(employee, referenceDate);
+                var effect = rule.Effect(employee, weekNo);
                 employee.BiWeeklySalary += effect;
                 result.Add(rule, effect);
             }
