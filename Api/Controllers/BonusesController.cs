@@ -32,7 +32,7 @@ public class BonusesController : ApiControllerWithProblemClassified
         var bonusResult = await _bonusService.CalculateBonus(employee, weekNo);
         if (bonusResult.IsError) return ClassifiedProblem(bonusResult.Errors);
 
-        return Ok(ModelToDtoMapper.MapBonusResponse(employee, weekNo, bonusResult.Value));
+        return Ok(ModelToDtoMapper.MapBonusResponse(bonusResult.Value));
     }
 
 

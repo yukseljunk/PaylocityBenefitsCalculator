@@ -36,15 +36,15 @@ namespace Api.Mappers
             };
         }
 
-        internal static GetBonusDto MapBonusResponse(Employee employee, int weekNo, Dictionary<ICalculationRule, decimal> details)
+        internal static GetBonusDto MapBonusResponse(Bonus bonus)//Employee employee, int weekNo, Dictionary<ICalculationRule, decimal> details
         {
             var detailsConverted = new Dictionary<string, decimal>();
-            details.ToList().ForEach(d => detailsConverted.Add(d.Key.Name, d.Value));
+            bonus.Details?.ToList().ForEach(d => detailsConverted.Add(d.Key.Name, d.Value));
             return new GetBonusDto()
             {
-                EmployeeId = employee.Id,
-                WeekNo = weekNo,
-                AmountToPay = employee.BiWeeklySalary,
+                EmployeeId = bonus.Employee.Id,
+                WeekNo = bonus.WeekNo,
+                AmountToPay = bonus.Employee.BiWeeklySalary,
                 Details = detailsConverted
             };
         }

@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Api.Dtos.Dependent;
 
-public class GetDependentDto
+public record GetDependentDto
 {
     public int Id { get; set; }
 

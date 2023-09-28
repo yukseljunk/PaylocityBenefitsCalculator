@@ -2,7 +2,7 @@
 using Api.Calculation.RuleEngine;
 using ErrorOr;
 using Api.Extensions;
-using Microsoft.VisualBasic;
+using Api.Models;
 
 namespace Api.Services;
 
@@ -16,7 +16,7 @@ public class BonusService : IBonusService
     }
 
 
-    public async Task<ErrorOr<Dictionary<ICalculationRule, decimal>>> CalculateBonus(Models.Employee employee, int weekNumber)
+    public async Task<ErrorOr<Bonus>> CalculateBonus(Models.Employee employee, int weekNumber)
     {
 
         var weeksForYear = new Dictionary<int, Tuple<DateTime, DateTime>>();
@@ -37,6 +37,14 @@ public class BonusService : IBonusService
             }
         }
 
-        return _calculationRuleEngine.Calculate(employee, weekNumber, weeksForYear, paycheckCountForMonth);
+        var details = _calculationRuleEngine.Calculate(employee, weekNumber, weeksForYear, paycheckCountForMonth);
+
+        return new Bonus() { 
+            WeekNo= weekNumber,
+            Employee= employee,
+            AmountToPay=0,
+            Details= details
+        };
+
     }
 }

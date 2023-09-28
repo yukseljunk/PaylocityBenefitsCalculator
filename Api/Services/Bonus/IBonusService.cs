@@ -1,10 +1,10 @@
-﻿using Api.Calculation.CalculationRules;
+﻿using Api.Models;
 using ErrorOr;
 
 namespace Api.Services;
 
 public interface IBonusService
 {
-    Task<ErrorOr<Dictionary<ICalculationRule, decimal>>> CalculateBonus(Models.Employee employee, int weekNumber);
+    Task<ErrorOr<Bonus>> CalculateBonus(Models.Employee employee, int weekNumber);
 
 }
