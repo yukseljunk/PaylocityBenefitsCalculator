@@ -1,4 +1,5 @@
 ﻿using Api.Dtos.Employee;
+using Api.Mappers;
 using Api.Models;
 using Api.Services;
 using ErrorOr;
@@ -12,9 +13,11 @@ namespace Api.Controllers;
 public class BonusesController : ApiControllerWithProblemClassified
 {
     private readonly IEmployeeService _employeeService;
-    public BonusesController(IEmployeeService employeeService)
+    private readonly IBonusService _bonusService;
+    public BonusesController(IEmployeeService employeeService, IBonusService bonusService)
     {
         _employeeService = employeeService;
+        _bonusService = bonusService;
     }
 
     [SwaggerOperation(Summary = "Get employee bonus by week number")]
@@ -25,8 +28,11 @@ public class BonusesController : ApiControllerWithProblemClassified
 
         if (getEmployeeResult.IsError) return ClassifiedProblem(getEmployeeResult.Errors);
 
-        throw new Exception("Need to figure out the rest...");
-        //return Ok(ModelToDtoMapper.MapEmployeeResponse(getEmployeeResult.Value));
+        var employee = getEmployeeResult.Value;
+        var bonusResult = await _bonusService.CalculateBonus(employee, weekNo);
+        if (bonusResult.IsError) return ClassifiedProblem(bonusResult.Errors);
+
+        return Ok(ModelToDtoMapper.MapBonusResponse(employee, weekNo, bonusResult.Value));
     }
 
 

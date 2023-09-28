@@ -1,15 +1,10 @@
 ﻿using Api.Models;
 namespace Api.Calculation.CalculationRules;
 
-public class BaseSalaryCalculationRule : CalculationRuleBase
+public class MonthlySalaryCalculationRule : CalculationRuleBase
 {
     private decimal BaseSalary;
 
-    public BaseSalaryCalculationRule(decimal baseSalary = 1000)
-    {
-        BaseSalary = baseSalary;
-    }
-    
     public override bool Eligible(IEmployee employee, DateTime referenceDate)
     {
         return true;
@@ -17,10 +12,10 @@ public class BaseSalaryCalculationRule : CalculationRuleBase
 
     public override decimal Effect(IEmployee employee, DateTime referenceDate)
     {
-        return BaseSalary;
+        return employee.Salary/12;
     }
 
-    public override string Name => "Base Bonus";
+    public override string Name => "Base Salary";
 
 }
 

@@ -18,6 +18,8 @@ public class YearlySalaryExceedRule : CalculationRuleBase
     {
         return -1 * employee.Salary * Percentage / 100;
     }
+
+    public override string Name => $"Yearly Salary Exceed {SalaryThreshold}$";
 }
 
 

@@ -19,6 +19,8 @@ public class DependentCalculationRule : CalculationRuleBase
         return Amount;
     }
 
+    public override string Name => "Spouse/Domestic Partner Bonus";
+
 }
 
 

@@ -21,6 +21,9 @@ public class KidsCalculationRule : CalculationRuleBase
     {
         return employee.Dependents.Count(e => e.Relationship == Relationship.Child && e.Age(referenceDate) <= MaxAgeForKids) * Amount;
     }
+
+    public override string Name => "Kids bonus";
+
 }
 
 

@@ -24,6 +24,8 @@ public class DependentsOverAgeRule : CalculationRuleBase
         return Amount;
     }
 
+    public override string Name => "Spouse/Dom. Partner Over 50 Bonus";
+
 }
 
 

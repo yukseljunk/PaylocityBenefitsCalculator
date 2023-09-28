@@ -1,6 +1,8 @@
-﻿using Api.Dtos.Dependent;
+﻿using Api.Calculation.CalculationRules;
+using Api.Dtos.Dependent;
 using Api.Dtos.Employee;
 using Api.Models;
+using ErrorOr;
 
 namespace Api.Mappers
 {
@@ -18,7 +20,7 @@ namespace Api.Mappers
             };
 
         }
-        
+
         public static GetEmployeeDto MapEmployeeResponse(Employee employee)
         {
             var dependents = new List<GetDependentDto>();
@@ -34,5 +36,17 @@ namespace Api.Mappers
             };
         }
 
+        internal static GetBonusDto MapBonusResponse(Employee employee, int weekNo, Dictionary<ICalculationRule, decimal> details)
+        {
+            var detailsConverted = new Dictionary<string, decimal>();
+            details.ToList().ForEach(d => detailsConverted.Add(d.Key.Name, d.Value / 2));
+            return new GetBonusDto()
+            {
+                EmployeeId = employee.Id,
+                WeekNo = weekNo,
+                AmountToPay = employee.MonthlySalary / 2,
+                Details = detailsConverted
+            };
+        }
     }
 }

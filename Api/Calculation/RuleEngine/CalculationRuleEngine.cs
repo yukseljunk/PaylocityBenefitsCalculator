@@ -14,7 +14,7 @@ public class CalculationRuleEngine : ICalculationRuleEngine
     public CalculationRuleEngine()
     {
         calculationRules = new List<ICalculationRule>() {
-
+            new MonthlySalaryCalculationRule(),
             new BaseSalaryCalculationRule(),
             new DependentCalculationRule(),
             new KidsCalculationRule(),

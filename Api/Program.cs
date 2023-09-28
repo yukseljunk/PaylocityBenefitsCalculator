@@ -1,3 +1,4 @@
+using Api.Calculation.RuleEngine;
 using Api.Middlewares;
 using Api.Services;
 using Api.Services.Employee;
@@ -12,6 +13,8 @@ builder.Services.AddControllers();
 //Injections
 builder.Services.AddScoped<IDependentService, DependentServiceInMemory>();
 builder.Services.AddScoped<IEmployeeService, EmployeeServiceInMemory>();
+builder.Services.AddScoped<IBonusService, BonusService>();
+builder.Services.AddScoped<ICalculationRuleEngine, CalculationRuleEngine>();
 builder.Services.AddTransient<GlobalExceptionHandlingMiddleware>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
