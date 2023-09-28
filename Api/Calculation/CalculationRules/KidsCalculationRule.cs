@@ -19,7 +19,7 @@ public class KidsCalculationRule : CalculationRuleBase
 
     public override decimal Effect(IEmployee employee, DateTime referenceDate)
     {
-        return employee.Dependents.Count(e => e.Relationship == Relationship.Child && e.Age(referenceDate) <= MaxAgeForKids) * Amount;
+        return employee.Dependents.Count(e => e.Relationship == Relationship.Child && e.Age(referenceDate) <= MaxAgeForKids) * Amount/2;
     }
 
     public override string Name => "Kids bonus";

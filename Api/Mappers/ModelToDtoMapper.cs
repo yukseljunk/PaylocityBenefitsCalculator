@@ -39,12 +39,12 @@ namespace Api.Mappers
         internal static GetBonusDto MapBonusResponse(Employee employee, int weekNo, Dictionary<ICalculationRule, decimal> details)
         {
             var detailsConverted = new Dictionary<string, decimal>();
-            details.ToList().ForEach(d => detailsConverted.Add(d.Key.Name, d.Value / 2));
+            details.ToList().ForEach(d => detailsConverted.Add(d.Key.Name, d.Value));
             return new GetBonusDto()
             {
                 EmployeeId = employee.Id,
                 WeekNo = weekNo,
-                AmountToPay = employee.MonthlySalary / 2,
+                AmountToPay = employee.BiWeeklySalary,
                 Details = detailsConverted
             };
         }

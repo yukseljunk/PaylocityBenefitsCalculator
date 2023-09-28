@@ -16,7 +16,7 @@ public class YearlySalaryExceedRule : CalculationRuleBase
     }
     public override decimal Effect(IEmployee employee, DateTime referenceDate)
     {
-        return -1 * employee.Salary * Percentage / 100;
+        return -1 * employee.Salary * Percentage/100/26;
     }
 
     public override string Name => $"Yearly Salary Exceed {SalaryThreshold}$";

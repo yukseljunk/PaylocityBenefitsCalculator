@@ -16,7 +16,7 @@ public class DependentCalculationRule : CalculationRuleBase
 
     public override decimal Effect(IEmployee employee, DateTime referenceDate)
     {
-        return Amount;
+        return Amount/2;
     }
 
     public override string Name => "Spouse/Domestic Partner Bonus";

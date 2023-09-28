@@ -1,7 +1,7 @@
 ﻿using Api.Models;
 namespace Api.Calculation.CalculationRules;
 
-public class MonthlySalaryCalculationRule : CalculationRuleBase
+public class BiweeklySalaryCalculationRule : CalculationRuleBase
 {
     private decimal BaseSalary;
 
@@ -12,7 +12,7 @@ public class MonthlySalaryCalculationRule : CalculationRuleBase
 
     public override decimal Effect(IEmployee employee, DateTime referenceDate)
     {
-        return employee.Salary/12;
+        return employee.Salary/26;
     }
 
     public override string Name => "Base Salary";

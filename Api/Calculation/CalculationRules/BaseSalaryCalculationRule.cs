@@ -17,7 +17,7 @@ public class BaseSalaryCalculationRule : CalculationRuleBase
 
     public override decimal Effect(IEmployee employee, DateTime referenceDate)
     {
-        return BaseSalary;
+        return BaseSalary/2;
     }
 
     public override string Name => "Base Bonus";

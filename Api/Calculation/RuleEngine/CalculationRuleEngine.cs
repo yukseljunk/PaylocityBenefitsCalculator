@@ -14,7 +14,7 @@ public class CalculationRuleEngine : ICalculationRuleEngine
     public CalculationRuleEngine()
     {
         calculationRules = new List<ICalculationRule>() {
-            new MonthlySalaryCalculationRule(),
+            new BiweeklySalaryCalculationRule(),
             new BaseSalaryCalculationRule(),
             new DependentCalculationRule(),
             new KidsCalculationRule(),
@@ -27,13 +27,13 @@ public class CalculationRuleEngine : ICalculationRuleEngine
     {
 
         var result = new Dictionary<ICalculationRule, decimal>();
-        employee.MonthlySalary = employee.Salary / 12;
+        employee.BiWeeklySalary = 0;
         foreach (var rule in calculationRules)
         {
             if (rule.Eligible(employee, referenceDate))
             {
                 var effect = rule.Effect(employee, referenceDate);
-                employee.MonthlySalary += effect;
+                employee.BiWeeklySalary += effect;
                 result.Add(rule, effect);
             }
         }

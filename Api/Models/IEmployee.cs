@@ -12,6 +12,6 @@ public interface IEmployee
     ICollection<Dependent> Dependents { get; set; }
 
     // extra fields
-    decimal MonthlySalary { get; set; }
+    decimal BiWeeklySalary { get; set; }
 
 }

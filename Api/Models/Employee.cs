@@ -15,7 +15,7 @@ public class Employee : IEmployee
     public DateTime DateOfBirth { get; set; }
     public ICollection<Dependent> Dependents { get; set; } = new List<Dependent>();
 
-    public decimal MonthlySalary { get; set; }
+    public decimal BiWeeklySalary { get; set; }
 
     private Employee(int id, string? firstName, string? lastName, decimal salary, DateTime dateOfBirth, ICollection<Dependent> dependents)
     {

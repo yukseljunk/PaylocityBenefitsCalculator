@@ -21,7 +21,7 @@ public class DependentsOverAgeRule : CalculationRuleBase
 
     public override decimal Effect(IEmployee employee, DateTime referenceDate)
     {
-        return Amount;
+        return Amount/2;
     }
 
     public override string Name => "Spouse/Dom. Partner Over 50 Bonus";
