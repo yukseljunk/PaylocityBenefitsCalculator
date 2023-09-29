@@ -40,9 +40,10 @@ public class CalculationRuleEngine : ICalculationRuleEngine
             {
                 var effect = rule.Effect(employee, weekNo);
                 employee.BiWeeklySalary += effect;
-                result.Add(rule, effect);
+                result.Add(rule, Decimal.Round(effect,2));
             }
         }
+        employee.BiWeeklySalary = Decimal.Round(employee.BiWeeklySalary, 2);
         return result;
     }
 }
