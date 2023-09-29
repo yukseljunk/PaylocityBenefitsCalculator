@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ApiTests;
@@ -15,7 +16,7 @@ public class IntegrationTest : IDisposable
 {
     private HttpClient? _httpClient;
     private List<GetEmployeeDto> _employees;
-
+    private static readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
     protected HttpClient HttpClient
     {
         get
@@ -152,25 +153,34 @@ public class IntegrationTest : IDisposable
     protected async Task CreateEmployees()
     {
 
-        foreach (var employee in Employees)
+        foreach (var employee in Employees.OrderBy(e=>e.Id))
         {
             await CreateEmployee(employee);
         }
 
     }
+    
 
     protected async Task CreateIfEmpty()
     {
-        var response = await HttpClient.GetAsync("/api/v1/employees");
-        var apiResponse = JsonConvert.DeserializeObject<ApiResponse<List<GetEmployeeDto>>>(await response.Content.ReadAsStringAsync());
-
-        if (apiResponse.Data != null)
+        await _semaphore.WaitAsync();
+        try
         {
-            if (apiResponse.Data.Count() == Employees.Count) return;
-            await DeleteEmployees();
-            await CreateEmployees();
-        }
+            var response = await HttpClient.GetAsync("/api/v1/employees");
+            var apiResponse = JsonConvert.DeserializeObject<ApiResponse<List<GetEmployeeDto>>>(await response.Content.ReadAsStringAsync());
 
+            if (apiResponse.Data != null)
+            {
+                if (apiResponse.Data.Count() == Employees.Count) return;
+                await DeleteEmployees();
+                await CreateEmployees();
+            }
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+        
     }
 
     public void Dispose()
