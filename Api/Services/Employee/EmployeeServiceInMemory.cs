@@ -38,8 +38,8 @@ public class EmployeeServiceInMemory : IEmployeeService
     public async Task<ErrorOr<Deleted>> DeleteEmployee(int id)
     {
         if (!_data.ContainsKey(id)) return EmployeeErrors.NotFound(id);
-
-        foreach (var dependent in _data[id].Dependents)
+        var dependents = _data[id].Dependents.ToList();
+        foreach (var dependent in dependents)
         {
             var result = await _dependentService.DeleteDependent(dependent.Id);
             if (result == DependentErrors.NotFound(id)) return DependentErrors.NotFound(id);
@@ -59,7 +59,7 @@ public class EmployeeServiceInMemory : IEmployeeService
 
     public async Task<ErrorOr<List<Models.Employee>>> GetEmployees()
     {
-        return _data.Values.ToList();
+        return _data.Values.OrderBy(e=>e.Id).ToList();
     }
 
     //Can be replaced with upsert, then no need to check for existence,

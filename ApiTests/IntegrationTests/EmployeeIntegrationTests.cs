@@ -1,10 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Net.Http;
+using System.Reflection.Metadata;
+using System.Text;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using Api.Dtos.Dependent;
 using Api.Dtos.Employee;
 using Api.Models;
+using ErrorOr;
+using Newtonsoft.Json;
 using Xunit;
 
 namespace ApiTests.IntegrationTests;
@@ -14,7 +20,6 @@ public class EmployeeIntegrationTests : IntegrationTest
     [Fact]
     public async Task WhenAskedForAllEmployees_ShouldReturnAllEmployees()
     {
-        var response = await HttpClient.GetAsync("/api/v1/employees");
         var employees = new List<GetEmployeeDto>
         {
             new()
@@ -80,6 +85,32 @@ public class EmployeeIntegrationTests : IntegrationTest
                 }
             }
         };
+
+
+
+        var response2 = await HttpClient.GetAsync("/api/v1/employees");
+        var apiResponse = JsonConvert.DeserializeObject<ApiResponse<List<GetEmployeeDto>>>(await response2.Content.ReadAsStringAsync());
+        if (apiResponse.Data != null)
+        {
+            foreach (var data in apiResponse.Data)
+            {
+                var result = await HttpClient.DeleteAsync("/api/v1/employees/"+data.Id);
+                string resultContent = await result.Content.ReadAsStringAsync();
+            }
+
+        }
+
+        foreach (var employee in employees)
+        {
+            var json = JsonConvert.SerializeObject(employee).ToString();
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var result = await HttpClient.PostAsync("/api/v1/employees", content);
+            string resultContent = await result.Content.ReadAsStringAsync();
+        }
+
+       
+
+        var response = await HttpClient.GetAsync("/api/v1/employees");
         await response.ShouldReturn(HttpStatusCode.OK, employees);
     }
 
@@ -88,6 +119,7 @@ public class EmployeeIntegrationTests : IntegrationTest
     public async Task WhenAskedForAnEmployee_ShouldReturnCorrectEmployee()
     {
         var response = await HttpClient.GetAsync("/api/v1/employees/1");
+        string resultContent = await response.Content.ReadAsStringAsync();
         var employee = new GetEmployeeDto
         {
             Id = 1,

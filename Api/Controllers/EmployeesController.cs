@@ -27,7 +27,15 @@ public class EmployeesController : ApiControllerWithProblemClassified
         ErrorOr<Employee> getEmployeeResult = await _employeeService.GetEmployee(id);
 
         if (getEmployeeResult.IsError) return ClassifiedProblem(getEmployeeResult.Errors);
-        return Ok(ModelToDtoMapper.MapEmployeeResponse(getEmployeeResult.Value));
+        //return Ok(ModelToDtoMapper.MapEmployeeResponse(getEmployeeResult.Value));
+
+
+        var result = new ApiResponse<GetEmployeeDto>
+        {
+            Data = ModelToDtoMapper.MapEmployeeResponse(getEmployeeResult.Value),
+            Success = true
+        };
+        return result;
     }
 
 
