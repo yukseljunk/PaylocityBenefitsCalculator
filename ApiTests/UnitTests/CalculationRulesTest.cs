@@ -14,6 +14,9 @@ namespace ApiTests.UnitTests
         protected Employee EmployeeWithSpouse = Employee.Create("Matthew", "Brown", 26000, DateTime.Today.AddYears(-35), new List<Dependent>() { 
             Dependent.Create("Susan","Brown", DateTime.Today.AddYears(-32), Relationship.Spouse).Value
                 }).Value;
+        protected Employee EmployeeWithKid = Employee.Create("Matthew", "Brown", 26000, DateTime.Today.AddYears(-35), new List<Dependent>() {
+            Dependent.Create("Matthew Jr","Brown", DateTime.Today.AddYears(-5), Relationship.Child).Value
+                }).Value;
         protected int ReferenceYear => 2023;
 
         protected Tuple<Dictionary<int, Tuple<DateTime, DateTime>>, Dictionary<int, int>> WpCalculation
