@@ -6,70 +6,90 @@ namespace Api.Services;
 
 public class DependentServiceInMemory : IDependentService
 {
+    public static readonly object _locker = new object();
+
     public static Dictionary<int, Dependent> _data = new();
     public async Task<ErrorOr<Created>> CreateDependent(Dependent dependent)
     {
         var newId = 1;
-        if (_data.Any())
+        lock (_locker)
         {
-            var keys = _data.Keys.ToList();
-            newId = keys.Max() + 1;
+            if (_data.Any())
+            {
+                var keys = _data.Keys.ToList();
+                newId = keys.Max() + 1;
+            }
+            _data.Add(newId, dependent);
         }
-        _data.Add(newId, dependent);
         dependent.Id = newId;
         return Result.Created;
     }
 
     public async Task<ErrorOr<Deleted>> DeleteDependent(int id)
     {
-        if (!_data.ContainsKey(id)) return DependentErrors.NotFound(id);
-        //delete the relationship
-        var dependentToDelete = _data[id];
-        dependentToDelete.Employee?.Dependents.Remove(dependentToDelete);
+        lock (_locker)
+        {
+            if (!_data.ContainsKey(id)) return DependentErrors.NotFound(id);
+            //delete the relationship
+            var dependentToDelete = _data[id];
+            dependentToDelete.Employee?.Dependents.Remove(dependentToDelete);
 
-        _data.Remove(id);
+            _data.Remove(id);
+        }
         return Result.Deleted;
     }
 
     public async Task<ErrorOr<Dependent>> GetDependent(int id)
     {
-        if (_data.ContainsKey(id))
+        lock (_locker)
         {
-            return _data[id];
+            if (_data.ContainsKey(id))
+            {
+                return _data[id];
+            }
         }
         return DependentErrors.NotFound(id);
     }
 
     public async Task<ErrorOr<List<Dependent>>> GetDependents()
     {
-        return _data.Values.OrderBy(d=>d.Id).ToList();
+        lock (_locker)
+        {
+            return _data.Values.OrderBy(d => d.Id).ToList();
+        }
     }
 
     public async Task<ErrorOr<Updated>> Update(Dependent dependent)
     {
-        if (_data.ContainsKey(dependent.Id))
+        Models.Employee? employee;
+        lock (_locker)
         {
-            var employee = _data[dependent.Id].Employee;
-
-            //update the employee dependent object
-            var employeeDependent = employee?.Dependents.FirstOrDefault(d => d.Id == dependent.Id);
-            if (employeeDependent != null)
+            if (!_data.ContainsKey(dependent.Id))
             {
-                employee?.Dependents.Remove(employeeDependent);
-                employee?.Dependents.Add(dependent);
+                return DependentErrors.NotFound(dependent.Id);
+
             }
-            
-            //fill employee values for the new objects
-            dependent.Employee = employee;
-            dependent.EmployeeId = employee.Id;
-
-
-            _data[dependent.Id] = dependent;
-            
-            
-            return Result.Updated;
+            employee = _data[dependent.Id].Employee;
 
         }
-        return DependentErrors.NotFound(dependent.Id);
+        //update the employee dependent object
+        var employeeDependent = employee?.Dependents.FirstOrDefault(d => d.Id == dependent.Id);
+        if (employeeDependent != null)
+        {
+            employee?.Dependents.Remove(employeeDependent);
+            employee?.Dependents.Add(dependent);
+        }
+
+        //fill employee values for the new objects
+        dependent.Employee = employee;
+        dependent.EmployeeId = employee.Id;
+
+        lock (_locker)
+        {
+            _data[dependent.Id] = dependent;
+        }
+
+
+        return Result.Updated;
     }
 }

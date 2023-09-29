@@ -6,23 +6,29 @@ namespace Api.Services.Employee;
 
 public class EmployeeServiceInMemory : IEmployeeService
 {
+    public static readonly object _locker = new object();
+
     private static Dictionary<int, Models.Employee> _data = new();
     public IDependentService _dependentService;
 
     public EmployeeServiceInMemory(IDependentService dependentService)
     {
         _dependentService = dependentService;
+
     }
 
     public async Task<ErrorOr<Created>> CreateEmployee(Models.Employee employee)
     {
         var newId = 1;
-        if (_data.Any())
+        lock (_locker)
         {
-            var keys = _data.Keys.ToList();
-            newId = keys.Max() + 1;
+            if (_data.Any())
+            {
+                var keys = _data.Keys.ToList();
+                newId = keys.Max() + 1;
+            }
+            _data.Add(newId, employee);
         }
-        _data.Add(newId, employee);
         employee.Id = newId;
 
         foreach (var dependent in employee.Dependents)
@@ -37,29 +43,39 @@ public class EmployeeServiceInMemory : IEmployeeService
 
     public async Task<ErrorOr<Deleted>> DeleteEmployee(int id)
     {
-        if (!_data.ContainsKey(id)) return EmployeeErrors.NotFound(id);
-        var dependents = _data[id].Dependents.ToList();
+        List<Dependent> dependents;
+        lock (_locker)
+        {
+            if (!_data.ContainsKey(id)) return EmployeeErrors.NotFound(id);
+            dependents = _data[id].Dependents.ToList();
+        }
         foreach (var dependent in dependents)
         {
             var result = await _dependentService.DeleteDependent(dependent.Id);
             if (result == DependentErrors.NotFound(id)) return DependentErrors.NotFound(id);
         }
-        _data.Remove(id);
+        lock (_locker) { _data.Remove(id); }
         return Result.Deleted;
     }
 
     public async Task<ErrorOr<Models.Employee>> GetEmployee(int id)
     {
-        if (_data.ContainsKey(id))
+        lock (_locker)
         {
-            return _data[id];
+            if (_data.ContainsKey(id))
+            {
+                return _data[id];
+            }
         }
         return EmployeeErrors.NotFound(id);
     }
 
     public async Task<ErrorOr<List<Models.Employee>>> GetEmployees()
     {
-        return _data.Values.OrderBy(e=>e.Id).ToList();
+        lock (_locker)
+        {
+            return _data.Values.OrderBy(e => e.Id).ToList();
+        }
     }
 
     //Can be replaced with upsert, then no need to check for existence,
@@ -68,10 +84,14 @@ public class EmployeeServiceInMemory : IEmployeeService
     //so logic needs to be using dependent service
     public async Task<ErrorOr<Updated>> Update(Models.Employee employee)
     {
-        if (!_data.ContainsKey(employee.Id)) return EmployeeErrors.NotFound(employee.Id);
+        ICollection<Dependent> dependents;
+        lock (_locker)
+        {
+            if (!_data.ContainsKey(employee.Id)) return EmployeeErrors.NotFound(employee.Id);
+            dependents = _data[employee.Id].Dependents;
+        }
 
         //dependent operations
-        var dependents = _data[employee.Id].Dependents;
         var newDependents = employee.Dependents;
 
         var removedDependentIds = dependents.Select(nd => nd.Id).Except(newDependents.Select(n => n.Id)).ToList();
@@ -103,7 +123,7 @@ public class EmployeeServiceInMemory : IEmployeeService
             dependent.EmployeeId = employee.Id;
             dependent.Employee = employee;
         }
-        _data[employee.Id] = employee;
+        lock (_locker) _data[employee.Id] = employee;
         return Result.Updated;
     }
 

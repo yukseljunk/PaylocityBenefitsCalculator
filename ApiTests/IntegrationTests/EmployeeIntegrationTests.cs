@@ -1,8 +1,10 @@
 using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Api.Dtos.Employee;
+using Newtonsoft.Json;
 using Xunit;
 
 namespace ApiTests.IntegrationTests;
@@ -46,5 +48,44 @@ public class EmployeeIntegrationTests : IntegrationTest
         await response.ShouldReturn(HttpStatusCode.NotFound);
     }
 
+    [Fact]
+    public async Task WhenAskedForCreatingEmployee_ShouldReturnCreated()
+    {
+        await CreateIfEmpty();
+        var employeeDto = new GetEmployeeDto() { FirstName = "John", LastName = "Doe", Salary = 78000m };
+        var response = await CreateEmployee(employeeDto);
+        await response.ShouldReturn(HttpStatusCode.Created);
+        await DeleteEmployees();
+    }
+
+    [Fact]
+    public async Task WhenAskedForCreatingInvalidEmployee_ShouldReturnBadRequest()
+    {
+        await CreateIfEmpty();
+        var employeeDto = new GetEmployeeDto() { FirstName = "A", LastName = "B", Salary = 78000m };
+        var response = await CreateEmployee(employeeDto);
+        await response.ShouldReturn(HttpStatusCode.BadRequest);
+    }
+
+    [Fact]
+    public async Task WhenAskedForUpdatingEmployee_ShouldReturnNoContent()
+    {
+        await CreateIfEmpty();
+        var employeeDto = Employees.First();
+        employeeDto.FirstName = "NewName";
+        var response = await UpdateEmployee(employeeDto);
+        await response.ShouldReturn(HttpStatusCode.NoContent);
+        await DeleteEmployees();
+    }
+
+    //[Fact]
+    //public async Task WhenAskedForDeletingEmployee_ShouldReturnNoContent()
+    //{
+    //    await CreateIfEmpty();
+    //    var employeeDto = Employees.First();
+    //    var response = await DeleteEmployee(employeeDto);
+    //    await response.ShouldReturn(HttpStatusCode.NoContent);
+    //    await DeleteEmployees();
+    //}
 }
 

@@ -132,15 +132,29 @@ public class IntegrationTest : IDisposable
         }
 
     }
+    protected async Task<HttpResponseMessage> CreateEmployee(GetEmployeeDto employee)
+    {
+        var json = JsonConvert.SerializeObject(employee).ToString();
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+        return await HttpClient.PostAsync("/api/v1/employees", content);
+    }
+    protected async Task<HttpResponseMessage> UpdateEmployee(GetEmployeeDto employee)
+    {
+        var json = JsonConvert.SerializeObject(employee).ToString();
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+        return await HttpClient.PutAsync("/api/v1/employees/" + employee.Id, content);
+    }
+    protected async Task<HttpResponseMessage> DeleteEmployee(GetEmployeeDto employee)
+    {
+        return await HttpClient.DeleteAsync("/api/v1/employees/" + employee.Id);
+    }
+
     protected async Task CreateEmployees()
     {
 
         foreach (var employee in Employees)
         {
-            var json = JsonConvert.SerializeObject(employee).ToString();
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
-            var result = await HttpClient.PostAsync("/api/v1/employees", content);
-            //string resultContent = await result.Content.ReadAsStringAsync();
+            await CreateEmployee(employee);
         }
 
     }
@@ -149,9 +163,10 @@ public class IntegrationTest : IDisposable
     {
         var response = await HttpClient.GetAsync("/api/v1/employees");
         var apiResponse = JsonConvert.DeserializeObject<ApiResponse<List<GetEmployeeDto>>>(await response.Content.ReadAsStringAsync());
+
         if (apiResponse.Data != null)
         {
-            if (apiResponse.Data.Count()==Employees.Count) return;
+            if (apiResponse.Data.Count() == Employees.Count) return;
             await DeleteEmployees();
             await CreateEmployees();
         }
