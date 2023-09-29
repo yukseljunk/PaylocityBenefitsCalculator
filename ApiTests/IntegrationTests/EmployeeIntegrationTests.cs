@@ -78,14 +78,14 @@ public class EmployeeIntegrationTests : IntegrationTest
         await DeleteEmployees();
     }
 
-    //[Fact]
-    //public async Task WhenAskedForDeletingEmployee_ShouldReturnNoContent()
-    //{
-    //    await CreateIfEmpty();
-    //    var employeeDto = Employees.First();
-    //    var response = await DeleteEmployee(employeeDto);
-    //    await response.ShouldReturn(HttpStatusCode.NoContent);
-    //    await DeleteEmployees();
-    //}
+    [Fact]
+    public async Task WhenAskedForDeletingEmployee_ShouldReturnNoContent()
+    {
+        await CreateIfEmpty();
+        var employeeDto = Employees.First();
+        var response = await DeleteEmployee(employeeDto);
+        await response.ShouldReturn(HttpStatusCode.NoContent);
+        await DeleteEmployees();
+    }
 }
 

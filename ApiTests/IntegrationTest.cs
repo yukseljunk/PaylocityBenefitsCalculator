@@ -127,7 +127,7 @@ public class IntegrationTest : IDisposable
         {
             foreach (var data in apiResponse.Data)
             {
-                var result = await HttpClient.DeleteAsync("/api/v1/employees/" + data.Id);
+                var result = await DeleteEmployee(data);
                 //string resultContent = await result.Content.ReadAsStringAsync();
             }
         }
@@ -181,6 +181,18 @@ public class IntegrationTest : IDisposable
             _semaphore.Release();
         }
         
+    }
+
+    protected async Task<HttpResponseMessage> DeleteDependent(GetDependentDto dependent)
+    {
+        return await HttpClient.DeleteAsync("/api/v1/dependents/" + dependent.Id);
+    }
+
+    protected async Task<HttpResponseMessage> UpdateDependent (GetDependentDto dependent)
+    {
+        var json = JsonConvert.SerializeObject(dependent).ToString();
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+        return await HttpClient.PutAsync("/api/v1/dependents/" + dependent.Id, content);
     }
 
     public void Dispose()
