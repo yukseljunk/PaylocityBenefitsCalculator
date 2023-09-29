@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using Api.Dtos.Dependent;
@@ -11,52 +10,18 @@ namespace ApiTests.IntegrationTests;
 public class DependentIntegrationTests : IntegrationTest
 {
     [Fact]
-    //task: make test pass
     public async Task WhenAskedForAllDependents_ShouldReturnAllDependents()
     {
+        await CreateIfEmpty();
         var response = await HttpClient.GetAsync("/api/v1/dependents");
-        var dependents = new List<GetDependentDto>
-        {
-            new()
-            {
-                Id = 1,
-                FirstName = "Spouse",
-                LastName = "Morant",
-                Relationship = Relationship.Spouse,
-                DateOfBirth = new DateTime(1998, 3, 3)
-            },
-            new()
-            {
-                Id = 2,
-                FirstName = "Child1",
-                LastName = "Morant",
-                Relationship = Relationship.Child,
-                DateOfBirth = new DateTime(2020, 6, 23)
-            },
-            new()
-            {
-                Id = 3,
-                FirstName = "Child2",
-                LastName = "Morant",
-                Relationship = Relationship.Child,
-                DateOfBirth = new DateTime(2021, 5, 18)
-            },
-            new()
-            {
-                Id = 4,
-                FirstName = "DP",
-                LastName = "Jordan",
-                Relationship = Relationship.DomesticPartner,
-                DateOfBirth = new DateTime(1974, 1, 2)
-            }
-        };
-        await response.ShouldReturn(HttpStatusCode.OK, dependents);
+        
+        await response.ShouldReturn(HttpStatusCode.OK, Dependents);
     }
 
     [Fact]
-    //task: make test pass
     public async Task WhenAskedForADependent_ShouldReturnCorrectDependent()
     {
+        await CreateIfEmpty();
         var response = await HttpClient.GetAsync("/api/v1/dependents/1");
         var dependent = new GetDependentDto
         {
@@ -70,9 +35,9 @@ public class DependentIntegrationTests : IntegrationTest
     }
 
     [Fact]
-    //task: make test pass
     public async Task WhenAskedForANonexistentDependent_ShouldReturn404()
     {
+        await CreateIfEmpty();
         var response = await HttpClient.GetAsync($"/api/v1/dependents/{int.MinValue}");
         await response.ShouldReturn(HttpStatusCode.NotFound);
     }

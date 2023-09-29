@@ -27,15 +27,12 @@ public class EmployeesController : ApiControllerWithProblemClassified
         ErrorOr<Employee> getEmployeeResult = await _employeeService.GetEmployee(id);
 
         if (getEmployeeResult.IsError) return ClassifiedProblem(getEmployeeResult.Errors);
-        //return Ok(ModelToDtoMapper.MapEmployeeResponse(getEmployeeResult.Value));
-
-
-        var result = new ApiResponse<GetEmployeeDto>
+        
+        return new ApiResponse<GetEmployeeDto>
         {
             Data = ModelToDtoMapper.MapEmployeeResponse(getEmployeeResult.Value),
             Success = true
         };
-        return result;
     }
 
 
@@ -142,13 +139,11 @@ public class EmployeesController : ApiControllerWithProblemClassified
         var employees = new List<GetEmployeeDto>();
         getEmployeesResult.Value.ForEach(e => employees.Add(ModelToDtoMapper.MapEmployeeResponse(e)));
                
-        var result = new ApiResponse<List<GetEmployeeDto>>
+        return new ApiResponse<List<GetEmployeeDto>>
         {
             Data = employees,
             Success = true
         };
-
-        return result;
     }
 
 }

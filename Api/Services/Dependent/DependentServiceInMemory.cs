@@ -42,7 +42,7 @@ public class DependentServiceInMemory : IDependentService
 
     public async Task<ErrorOr<List<Dependent>>> GetDependents()
     {
-        return _data.Values.ToList();
+        return _data.Values.OrderBy(d=>d.Id).ToList();
     }
 
     public async Task<ErrorOr<Updated>> Update(Dependent dependent)

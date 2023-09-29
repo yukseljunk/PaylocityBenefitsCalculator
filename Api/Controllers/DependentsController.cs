@@ -27,7 +27,13 @@ public class DependentsController : ApiControllerWithProblemClassified
         ErrorOr<Dependent> getDependentResult = await _dependentService.GetDependent(id);
 
         if (getDependentResult.IsError) return ClassifiedProblem(getDependentResult.Errors);
-        return Ok(ModelToDtoMapper.MapDependentResponse(getDependentResult.Value));
+       
+        return new ApiResponse<GetDependentDto>
+        {
+            Data = ModelToDtoMapper.MapDependentResponse(getDependentResult.Value),
+            Success = true
+        };
+
     }
 
     [SwaggerOperation(Summary = "Delete dependent by id")]
