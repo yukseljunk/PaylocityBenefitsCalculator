@@ -39,12 +39,6 @@ public class BonusService : IBonusService
 
         var details = _calculationRuleEngine.Calculate(employee, weekNumber, weeksForYear, paycheckCountForMonth);
 
-        return new Bonus() { 
-            WeekNo= weekNumber,
-            Employee= employee,
-            AmountToPay=0,
-            Details= details
-        };
-
+        return Bonus.Create(weekNumber, employee, 0, details);
     }
 }

@@ -28,6 +28,17 @@ public class BonusIntegrationTests : IntegrationTest
         await response.ShouldReturn(HttpStatusCode.OK, bonusDto);
     }
 
-
+    [Theory]
+    [InlineData(55)]
+    [InlineData(27)]
+    [InlineData(0)]
+    [InlineData(-5)]
+    public async Task WhenAskedForBonusWithInvalidWeek_ShouldReturnBadRequest(int weekNo)
+    {
+        var employeeId = 1;
+        await CreateIfEmpty();
+        var response = await HttpClient.GetAsync($"/api/v1/bonuses/{employeeId}/week/{weekNo}");
+        await response.ShouldReturn(HttpStatusCode.BadRequest);
+    }
 }
 
