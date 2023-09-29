@@ -29,6 +29,11 @@ public class CalculationRuleEngine : ICalculationRuleEngine
         Dictionary<int, int> paycheckCountForMonth)
     {
 
+        if(!weeksForYear.ContainsKey(weekNo))
+        {
+            return null;
+        }
+
         var result = new Dictionary<ICalculationRule, decimal>();
         employee.BiWeeklySalary = 0;
         foreach (var rule in calculationRules)

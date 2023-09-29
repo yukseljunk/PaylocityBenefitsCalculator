@@ -16,7 +16,7 @@ public class DependentCalculationRule : CalculationRuleBase
 
     public override decimal Effect(IEmployee employee, int weekNo)
     {
-        return Amount/2;
+        return Amount/PaycheckCountForMonth[WeeksForYear[weekNo].Item2.Month];
     }
 
     public override string Name => "Spouse/Domestic Partner Bonus";

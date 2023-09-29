@@ -17,7 +17,7 @@ public class BaseSalaryCalculationRule : CalculationRuleBase
 
     public override decimal Effect(IEmployee employee, int weekNo)
     {
-        return BaseSalary/2;
+        return BaseSalary/PaycheckCountForMonth[WeeksForYear[weekNo].Item2.Month];
     }
 
     public override string Name => "Base Bonus";
